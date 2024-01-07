@@ -1,0 +1,8 @@
+__pycache__/
+.env/
+.ipynb_checkpoints/
+archive/
+data/
+models/
+tokenized_dataset.hf/
+wandb/
