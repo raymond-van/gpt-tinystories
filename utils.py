@@ -42,7 +42,10 @@ def test_language_modeling(model, tokenizer, len=200, prompt=None, device='cuda'
     if prompt is None:
         prompt = "One day, a little girl named Lily found a needle in her room."
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
-    greedy_output = model.generate(input_ids, len)
+    if torch.cuda.device_count() > 1:
+        greedy_output = model.module.generate(input_ids, len)
+    else:
+        greedy_output = model.generate(input_ids, len)
     print("Output:\n" + 100 * '-')
     print(tokenizer.decode(greedy_output[0], skip_special_tokens=True))
 
@@ -53,6 +56,8 @@ def estimate_loss(model, tokenizer, valid_loader, device='cuda'):
         for k,batch in enumerate(valid_loader):
             tokenized = tokenizer(batch['text'], padding=True, return_tensors='pt', max_length = 256, truncation = True)['input_ids'].to(device)
             _, loss = model(tokenized,tokenized)
+            if torch.cuda.device_count() > 1:
+                loss = loss.mean()
             losses[k] = loss.item()
             if k == 50 - 1 :
                 break
@@ -65,10 +70,11 @@ def save_checkpoint(model, optimizer, updates, filename="checkpoint.pt.tar"):
              'optimizer': optimizer.state_dict()}
     torch.save(state, filename)
 
-def load_checkpoint(model, optim, filename):
+def load_checkpoint(model, filename, optim=None):
     checkpoint = torch.load(filename)
     model.load_state_dict(checkpoint['state_dict'])
-    optim.load_state_dict(checkpoint['optimizer'])
+    if optim is not None:
+        optim.load_state_dict(checkpoint['optimizer'])
     updates = checkpoint['updates']
     return updates
 

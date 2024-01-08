@@ -6,3 +6,4 @@ data/
 models/
 tokenized_dataset.hf/
 wandb/
+.vscode/
