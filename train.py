@@ -1,3 +1,4 @@
+import argparse
 import logging
 import random
 import sys
@@ -18,8 +19,14 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer, GPT2Config,
 from model import GPT
 from utils import *  # contains all of the helper methods
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--cfg_param', 
+                    type=str,
+                    default="8M")
+args = parser.parse_args()
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-cfg_param = "8M"
+cfg_param = args.cfg_param
 cfg = load_config(f"configs/config-{cfg_param}.json")
 batch_size = cfg["batch_size"]
 window_size = cfg["window_size"]

@@ -52,14 +52,14 @@ def test_language_modeling(model, tokenizer, len=200, prompt=None, device='cuda'
 def estimate_loss(model, tokenizer, valid_loader, device='cuda'):
     model.eval()
     with torch.no_grad():
-        losses = torch.zeros(100)
+        losses = torch.zeros(40)
         for k,batch in enumerate(valid_loader):
             tokenized = tokenizer(batch['text'], padding=True, return_tensors='pt', max_length = 256, truncation = True)['input_ids'].to(device)
             _, loss = model(tokenized,tokenized)
             if torch.cuda.device_count() > 1:
                 loss = loss.mean()
             losses[k] = loss.item()
-            if k == 50 - 1 :
+            if k == 40 - 1 :
                 break
     model.train()
     return losses.mean()
