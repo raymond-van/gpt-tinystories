@@ -1,7 +1,5 @@
 import argparse
 import logging
-import random
-import sys
 from datetime import datetime
 
 import numpy as np
@@ -26,6 +24,8 @@ parser.add_argument('--cfg_param',
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+epochs = 3
+seed = 3407
 cfg_param = args.cfg_param
 cfg = load_config(f"configs/config-{cfg_param}.json")
 batch_size = cfg["batch_size"]
@@ -46,11 +46,11 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
 # Instantiate dataloader
-train_loader = DataLoader(dataset['train'], batch_size=32, shuffle=True)
-valid_loader = DataLoader(dataset['validation'], batch_size=32, shuffle=True)
+train_loader = DataLoader(dataset['train'], batch_size=batch_size, shuffle=True)
+valid_loader = DataLoader(dataset['validation'], batch_size=batch_size, shuffle=True)
 
 # Instantiate model and optimizer
-setup_seed(3407)
+setup_seed(seed)
 model = GPT(cfg)
 if torch.cuda.device_count() > 1:
     # if multiple gpus on single machine
@@ -66,13 +66,29 @@ if resume_training:
     logging.info(f"Resuming training for {model_filename}")
     updates = load_checkpoint(model, optim, model_filename)
 
+# Setup weights & biases
+run = wandb.init(
+    project="gpt-tinystories",
+    name=f"gpt-tinystories-{current_time}",
+    config={
+        "cfg_param": "8M",
+        "learning_rate": 1e-3,
+        "batch_size": batch_size,
+        "model_filename": model_filename,
+        "log_filename": log_filename,
+        "seed": seed,
+        "epochs": epochs
+    },
+)
+logging.info(f"cfg_param: {cfg_param}, lr: {lr}, batch_size: {batch_size}, model_filename: {model_filename}, log_filename: {log_filename}, seed: {seed}, epochs: {epochs}")
+
 # Training loop
-for epoch in range(1):
+for epoch in range(epochs):
     logging.info(f"Epoch: {epoch+1}")
     for batch in tqdm(train_loader):
         optim.zero_grad()
         tokenized = tokenizer(batch['text'], padding=True, return_tensors='pt', max_length=256, truncation=True)['input_ids'].to(device)
-        logits, loss = model(tokenized,tokenized)
+        _, loss = model(tokenized, tokenized)
         if torch.cuda.device_count() > 1:
             loss = loss.mean()
         loss.backward()
@@ -82,6 +98,7 @@ for epoch in range(1):
             validation_loss = estimate_loss(model, tokenizer, valid_loader)
             tqdm.write(f"Train_{epoch+1}_{updates}: {validation_loss}")
             logging.info(f"Train_{epoch+1}_{updates}: {validation_loss}")
+            wandb.log({"train_loss": loss, "val_loss": validation_loss})
         if updates % 2000 == 0:
             save_checkpoint(model, optim, updates, model_filename)
     logging.info("TRAINING COMPLETE")
@@ -91,6 +108,15 @@ for epoch in range(1):
         loss_valid = 0
         for batch in tqdm(valid_loader):
             tokenized = tokenizer(batch['text'], padding=True, return_tensors='pt', max_length=512,truncation=True)['input_ids'].to(device)
-            loss_valid += model(tokenized, labels=tokenized)["loss"].item()
+            _, loss = model(tokenized, tokenized)
+            loss_valid += loss.mean().item()
         logging.info(f"Final validation loss: {loss_valid}")
         save_checkpoint(model, optim, updates, model_filename)
+        # save trained model as artifact to wandb
+        model_artifact = wandb.Artifact('model_artifact', type='model')
+        model_artifact.add_file(model_filename)
+        wandb.log_artifact(model_artifact)
+        wandb.finish()
+
+# Trained model output
+test_language_modeling(model, tokenizer)
