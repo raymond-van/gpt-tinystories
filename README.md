@@ -1,7 +1,7 @@
 # gpt-tinystories
 
 This repo contains an implementation of GPT-2 (1M / 8M / 28M parameter variants) and a script to train the model from scratch. 
-Training was done on the TinyStories dataset.
+Training was done on the [TinyStories dataset](https://arxiv.org/pdf/2305.07759.pdf).
 
 Despite only having a few million parameters, these models are able to produce coherent and fluent english whereas larger models with 125M parameters such as GPT-neo or GPT-2 can be seen struggling to produce such coherent text.
 
