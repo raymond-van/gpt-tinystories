@@ -45,18 +45,18 @@ Prompt: *One day, a little girl named Lily found a needle in her room*
 
 See inference.ipynb for more information.
 #### 8M
-One day, a little girl named Lily found a needle in her room. It was shiny and shiny. She showed it to her mom. "Look, mom! I found a needle!" she said.
+*One day, a little girl named Lily found a needle in her room. It was shiny and shiny. She showed it to her mom. "Look, mom! I found a needle!" she said.
 Her mom smiled and said, "Good job, Lily! You keep this needle safe from the icy ground."
 Lily put the needle in her toy box. It was her friend. They played with the needle all day long. They took turns to wrap it around the room.
 Soon, it was time for bed. Lily was sleepy. She put the needle on her bed and closed the winter box. "Good night, Lily. Now it will be warm so." "Goodnight, Jack. I love we coats until it is warm."
-Lily fell asleep under the icy bed. She felt happy and cozy. She knew the needle two good listening to her mom. When she woke up, they went to play on her useful once more. She loved to play with her friends. And they all lived happily ever after.
+Lily fell asleep under the icy bed. She felt happy and cozy. She knew the needle two good listening to her mom. When she woke up, they went to play on her useful once more. She loved to play with her friends. And they all lived happily ever after.*
 #### 28M
-One day, a little girl named Lily found a needle in her room. She wanted to make a special necklace with it. Lily took the needle out of the box and tried to make a pretty necklace. But it was not easy to make a special necklace.
+*One day, a little girl named Lily found a needle in her room. She wanted to make a special necklace with it. Lily took the needle out of the box and tried to make a pretty necklace. But it was not easy to make a special necklace.
 Lily's mom saw her trying to make the necklace. She smiled and said, "I can help you, Lily! Let squeezing a half of the needle together. It will make you look perfect." Lily was happy and on the other hand.
 Together, they poked and made a beautiful necklace. Lily wore it to the park to play with her friends. She was very good at making pretty things. Lily knew that the special necklace would make everyone as happy as it was still for her. And whenever Lily wore her colorful necklace, she remembered how she just used the needle to make it and felt proud. And she remembered that it was just as fun to make something new. And that's a moral value for her family.
-The moral of the story is that using special tools can
+The moral of the story is that using special tools can*
 #### Author's trained model
-One day, a little girl named Lily found a needle in her room. She was very happy and wanted to help her mommy.
+*One day, a little girl named Lily found a needle in her room. She was very happy and wanted to help her mommy.
 Lily asked her mommy, "Can I help you, mommy?" Her mommy said, "Of course, Lily. Let's go to the store and buy some candy."
 Lily was so happy and said, "Thank you, mommy! I love candy!" Her mommy smiled and said, "You're welcome, Lily. You're welcome."
-Lily was happy to have a new friend and a new friend. She was happy to have a new friend and a new friend.
+Lily was happy to have a new friend and a new friend. She was happy to have a new friend and a new friend.*
