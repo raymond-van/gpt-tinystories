@@ -11,8 +11,7 @@ from datasets import load_dataset
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-from transformers import (AutoModelForCausalLM, AutoTokenizer, GPT2Config,
-                          GPT2LMHeadModel)
+from transformers import AutoTokenizer
 
 from model import GPT
 from utils import *  # contains all of the helper methods
@@ -46,7 +45,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
 # Instantiate dataloader
-train_loader = DataLoader(dataset['train'], batch_size=batch_size, shuffle=True)
+train_loader = DataLoader(dataset['train'], batch_size=64, shuffle=True)
 valid_loader = DataLoader(dataset['validation'], batch_size=batch_size, shuffle=True)
 
 # Instantiate model and optimizer
@@ -59,7 +58,7 @@ model.to(device)
 optim = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.9, 0.95))
 
 updates = 0
-model_filename = f"models/model_{current_time}.pt.tar"
+model_filename = f"models/model_{cfg_param}_{current_time}.pt.tar"
 resume_training = False
 if resume_training:
     model_filename = ""
@@ -69,10 +68,10 @@ if resume_training:
 # Setup weights & biases
 run = wandb.init(
     project="gpt-tinystories",
-    name=f"gpt-tinystories-{current_time}",
+    name=f"gpt-tinystories-{cfg_param}-{current_time}",
     config={
-        "cfg_param": "8M",
-        "learning_rate": 1e-3,
+        "cfg_param": cfg_param,
+        "learning_rate": lr,
         "batch_size": batch_size,
         "model_filename": model_filename,
         "log_filename": log_filename,
@@ -110,13 +109,12 @@ for epoch in range(epochs):
             tokenized = tokenizer(batch['text'], padding=True, return_tensors='pt', max_length=512,truncation=True)['input_ids'].to(device)
             _, loss = model(tokenized, tokenized)
             loss_valid += loss.mean().item()
-        logging.info(f"Final validation loss: {loss_valid}")
+        logging.info(f"Final validation loss: {loss_valid / len(valid_loader)}")
         save_checkpoint(model, optim, updates, model_filename)
         # save trained model as artifact to wandb
         model_artifact = wandb.Artifact('model_artifact', type='model')
         model_artifact.add_file(model_filename)
         wandb.log_artifact(model_artifact)
-        wandb.finish()
 
 # Trained model output
 test_language_modeling(model, tokenizer)

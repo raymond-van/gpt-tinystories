@@ -42,9 +42,9 @@ class GPT(nn.Module):
         return logits, loss
 
     @torch.no_grad() 
-    def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None):
+    def generate(self, idx, max_length, pad_token_id=50256, temperature=1.0, top_k=None):
         # idx: B, T
-        for _ in range(max_new_tokens):
+        for _ in range(max_length):
             idx = idx[:, -self.config['window_size']:]
             logits, _ = self(idx)
             logits = logits[:, -1, :] / temperature
@@ -72,7 +72,7 @@ class GPT(nn.Module):
 
 class DecoderBlock(nn.Module):
     # Decoder block consisting of attention and mlp sub-blocks 
-    # Decoder block interveaves sub-blocks with residual paths and layer norms
+    # Decoder block interweaves sub-blocks with residual paths and layer norms
     def __init__(self, config):
         super(DecoderBlock, self).__init__()
         self.ln1 = nn.LayerNorm(config['hidden_size'])
@@ -92,7 +92,7 @@ class DecoderBlock(nn.Module):
         return x
 
 class MultiheadAttention(nn.Module):
-    # Attention part of decoder block
+    # Attention sub-block of decoder block
     def __init__(self, config):
         super(MultiheadAttention, self).__init__()
         mx_pos = config['max_position_embeddings']
@@ -147,7 +147,7 @@ class MultiheadAttention(nn.Module):
         return attn_output
 
 class MLP(nn.Module):
-    # Feedforward NN part of decoder block
+    # Feedforward NN sub-block of decoder block
     def __init__(self, config):
         super().__init__()
         embed_dim = config['hidden_size']
